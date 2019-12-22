@@ -1,14 +1,14 @@
 # Created by https://www.gitignore.io/api/linux,gradle,eclipse,windows,forgegradle,intellij+all,emacs,vim
 
-# stop skidding kami blue
+# build tools which aren't needed in the assets branch  
 
-#gradle*
-#gradlew*
-#gradle/
+gradle*
+gradlew*
+gradle/
 buildext.sh
 deltags.sh
 buildexttmp.sh
-#build.gradle
+build.gradle
 builddonator.sh
 buildkeygen.sh
 build.sh
