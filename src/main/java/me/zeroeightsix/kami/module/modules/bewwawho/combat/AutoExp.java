@@ -5,9 +5,13 @@ import me.zero.alpine.listener.Listener;
 import me.zeroeightsix.kami.command.Command;
 import me.zeroeightsix.kami.event.events.PacketEvent;
 import me.zeroeightsix.kami.module.Module;
+import me.zeroeightsix.kami.module.modules.zeroeightysix.combat.Aura;
 import me.zeroeightsix.kami.setting.Setting;
 import me.zeroeightsix.kami.setting.Settings;
 import net.minecraft.init.Items;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 
 /**
  * Created 17 October 2019 by hub
@@ -19,8 +23,12 @@ public class AutoExp extends Module {
     private Setting<Boolean> autoThrow = register(Settings.b("Auto Throw", true));
     private Setting<Boolean> autoSwitch = register(Settings.b("Auto Switch", true));
     private Setting<Boolean> autoDisable = register(Settings.booleanBuilder("Auto Disable").withValue(true).withVisibility(o -> autoSwitch.getValue()).build());
+    private Setting<Boolean> checkRepairable = register(Settings.b("Check Repairable", true));
+    private Setting<Integer> delay = register(Settings.integerBuilder("Delay (Ticks)").withMinimum(1).withValue(1));
 
     private int initHotbarSlot = -1;
+    private int usableDelay;
+    private int oldDelay = delay.getValue();
 
     @EventHandler
     private Listener<PacketEvent.Receive> receiveListener = new Listener<>(event ->
@@ -58,10 +66,42 @@ public class AutoExp extends Module {
 
     }
 
+    private boolean hasMending(ItemStack stack) {
+        if (stack.getEnchantmentTagList() != null && (stack.getEnchantmentTagList().toString().contains("lvl:1s,id:70s") || stack.getEnchantmentTagList().toString().contains("id:70s,lvl:1s"))) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private boolean isDamaged(ItemStack stack) {
+        return (stack != ItemStack.EMPTY && stack.getItemDamage() > 0);
+    }
+
     @Override
     public void onUpdate() {
+        if (delay.getValue() != oldDelay) {
+            usableDelay = delay.getValue();
+        }
+
+        oldDelay = delay.getValue();
+
+        if (usableDelay > 0) {
+            usableDelay--;
+            return;
+        } else {
+            usableDelay = delay.getValue();
+        }
 
         if (mc.player == null) {
+            return;
+        }
+
+        if (checkRepairable.getValue() && !((hasMending(mc.player.inventory.armorInventory.get(0)) && isDamaged(mc.player.inventory.armorInventory.get(0)))
+                || (hasMending(mc.player.inventory.armorInventory.get(1)) && isDamaged(mc.player.inventory.armorInventory.get(1)))
+                || (hasMending(mc.player.inventory.armorInventory.get(2)) && isDamaged(mc.player.inventory.armorInventory.get(2)))
+                || (hasMending(mc.player.inventory.armorInventory.get(3)) && isDamaged(mc.player.inventory.armorInventory.get(3)))
+                || (hasMending(mc.player.getHeldItemOffhand()) && isDamaged(mc.player.getHeldItemOffhand())))) {
             return;
         }
 
