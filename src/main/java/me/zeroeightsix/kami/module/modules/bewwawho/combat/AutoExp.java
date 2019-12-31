@@ -5,17 +5,15 @@ import me.zero.alpine.listener.Listener;
 import me.zeroeightsix.kami.command.Command;
 import me.zeroeightsix.kami.event.events.PacketEvent;
 import me.zeroeightsix.kami.module.Module;
-import me.zeroeightsix.kami.module.modules.zeroeightysix.combat.Aura;
 import me.zeroeightsix.kami.setting.Setting;
 import me.zeroeightsix.kami.setting.Settings;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
 
 /**
  * Created 17 October 2019 by hub
  * Updated 21 November 2019 by hub
+ * Updated 1 January 2020 by d1gress/Qther
  */
 @Module.Info(name = "AutoExp", category = Module.Category.COMBAT, description = "Auto Switch to XP and throw fast")
 public class AutoExp extends Module {
