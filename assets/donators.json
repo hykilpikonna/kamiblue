@@ -1,6 +1,7 @@
 [
   {
-    "uuid": "47f78584-c76c-4191-92fd-8c943af13054"
+    "uuid": "47f78584-c76c-4191-92fd-8c943af13054",
+    "type": "1"
   },
   {
     "uuid": "8eea2cfc-9ebb-41dd-a77f-007404d98d4b"
@@ -75,10 +76,12 @@
     "uuid": "25349b00-4721-4d44-aa26-f65b30f0a04e"
   },
   {
-    "uuid": "8857bed1-5d57-4fb6-80f8-c08506a65dbc"
+    "uuid": "8857bed1-5d57-4fb6-80f8-c08506a65dbc",
+    "type": "2"
   },
   {
-    "uuid": "c17084ff-b1c6-4976-ae9e-4020dabc01e6"
+    "uuid": "c17084ff-b1c6-4976-ae9e-4020dabc01e6",
+    "type": "2"
   },
   {
     "uuid": "fe56f64c-0059-4d0c-accf-a3f74c0abbd3"
