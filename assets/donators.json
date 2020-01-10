@@ -103,7 +103,8 @@
     "type": "3"
   },
   {
-    "uuid": "57a03a14-ee1f-4f55-a7cd-6a88843fa50c"
+    "uuid": "57a03a14-ee1f-4f55-a7cd-6a88843fa50c",
+    "type": "4"
   },
   {
     "uuid": "9fb22b27-5fda-48ed-8a5a-ad6e1ff30d71"
@@ -121,7 +122,6 @@
     "uuid": "f8fe9215-cb25-457d-a708-140b62431223"
   },
   {
-    "uuid": "9869f085-2ecc-4173-bf13-9a26416d4fac",
-    "type": "4"
+    "uuid": "9869f085-2ecc-4173-bf13-9a26416d4fac"
   }
 ]
