@@ -99,8 +99,8 @@ public class AutoExp extends Module {
 
         if (checkRepairable.getValue() && !((hasMending(mc.player.inventory.armorInventory.get(0)) && shouldMend(mc.player.inventory.armorInventory.get(0)) && slotNull(0))
                 || (hasMending(mc.player.inventory.armorInventory.get(1)) && shouldMend(mc.player.inventory.armorInventory.get(1)) && slotNull(1))
-                || (hasMending(mc.player.inventory.armorInventory.get(2)) && shouldMend(mc.player.inventory.armorInventory.get(2)) && slotNull(1))
-                || (hasMending(mc.player.inventory.armorInventory.get(3)) && shouldMend(mc.player.inventory.armorInventory.get(3)) && slotNull(1))
+                || (hasMending(mc.player.inventory.armorInventory.get(2)) && shouldMend(mc.player.inventory.armorInventory.get(2)) && slotNull(2))
+                || (hasMending(mc.player.inventory.armorInventory.get(3)) && shouldMend(mc.player.inventory.armorInventory.get(3)) && slotNull(3))
                 || (hasMending(mc.player.getHeldItemOffhand()) && shouldMend(mc.player.getHeldItemOffhand())))) {
             return;
         }
