@@ -13,7 +13,8 @@ import net.minecraft.item.ItemStack;
 /**
  * Created 17 October 2019 by hub
  * Updated 21 November 2019 by hub
- * Updated 1 January 2020 by d1gress/Qther
+ * Updated 15 January 2020 by d1gress/Qther
+ * Updated by S-B99 on 15/01/20
  */
 @Module.Info(name = "AutoExp", category = Module.Category.COMBAT, description = "Auto Switch to XP and throw fast")
 public class AutoExp extends Module {
@@ -71,7 +72,7 @@ public class AutoExp extends Module {
     }
 
     private boolean shouldMend(ItemStack stack) {
-        return (stack != ItemStack.EMPTY && (100 * stack.getItemDamage() / stack.getMaxDamage()) <= threshold.getValue());
+        return (stack != ItemStack.EMPTY && (100 * stack.getItemDamage() / stack.getMaxDamage()) >= threshold.getValue());
     }
 
     @Override
