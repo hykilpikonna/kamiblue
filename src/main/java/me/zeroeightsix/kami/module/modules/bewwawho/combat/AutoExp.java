@@ -22,6 +22,7 @@ public class AutoExp extends Module {
     private Setting<Boolean> autoSwitch = register(Settings.b("Auto Switch", true));
     private Setting<Boolean> autoDisable = register(Settings.booleanBuilder("Auto Disable").withValue(true).withVisibility(o -> autoSwitch.getValue()).build());
     private Setting<Boolean> checkRepairable = register(Settings.b("Check Repairable", true));
+    private Setting<Integer> threshold = register(Settings.integerBuilder("Repair %").withMinimum(1).withMaximum(100).withValue(70));
     private Setting<Integer> delay = register(Settings.integerBuilder("Delay (Ticks)").withMinimum(1).withValue(1));
 
     private int initHotbarSlot = -1;
@@ -65,15 +66,12 @@ public class AutoExp extends Module {
     }
 
     private boolean hasMending(ItemStack stack) {
-        if (stack.getEnchantmentTagList() != null && (stack.getEnchantmentTagList().toString().contains("lvl:1s,id:70s") || stack.getEnchantmentTagList().toString().contains("id:70s,lvl:1s"))) {
-            return true;
-        } else {
-            return false;
-        }
+        stack.getEnchantmentTagList();
+        return stack.getEnchantmentTagList().toString().contains("lvl:1s,id:70s") || stack.getEnchantmentTagList().toString().contains("id:70s,lvl:1s");
     }
 
-    private boolean isDamaged(ItemStack stack) {
-        return (stack != ItemStack.EMPTY && stack.getItemDamage() > 0);
+    private boolean shouldMend(ItemStack stack) {
+        return (stack != ItemStack.EMPTY && (100 * stack.getItemDamage() / stack.getMaxDamage()) <= threshold.getValue());
     }
 
     @Override
@@ -95,11 +93,11 @@ public class AutoExp extends Module {
             return;
         }
 
-        if (checkRepairable.getValue() && !((hasMending(mc.player.inventory.armorInventory.get(0)) && isDamaged(mc.player.inventory.armorInventory.get(0)))
-                || (hasMending(mc.player.inventory.armorInventory.get(1)) && isDamaged(mc.player.inventory.armorInventory.get(1)))
-                || (hasMending(mc.player.inventory.armorInventory.get(2)) && isDamaged(mc.player.inventory.armorInventory.get(2)))
-                || (hasMending(mc.player.inventory.armorInventory.get(3)) && isDamaged(mc.player.inventory.armorInventory.get(3)))
-                || (hasMending(mc.player.getHeldItemOffhand()) && isDamaged(mc.player.getHeldItemOffhand())))) {
+        if (checkRepairable.getValue() && !((hasMending(mc.player.inventory.armorInventory.get(0)) && shouldMend(mc.player.inventory.armorInventory.get(0)))
+                || (hasMending(mc.player.inventory.armorInventory.get(1)) && shouldMend(mc.player.inventory.armorInventory.get(1)))
+                || (hasMending(mc.player.inventory.armorInventory.get(2)) && shouldMend(mc.player.inventory.armorInventory.get(2)))
+                || (hasMending(mc.player.inventory.armorInventory.get(3)) && shouldMend(mc.player.inventory.armorInventory.get(3)))
+                || (hasMending(mc.player.getHeldItemOffhand()) && shouldMend(mc.player.getHeldItemOffhand())))) {
             return;
         }
 
