@@ -67,12 +67,11 @@ public class AutoExp extends Module {
     }
 
     private boolean hasMending(ItemStack stack) {
-        stack.getEnchantmentTagList();
         return stack.getEnchantmentTagList().toString().contains("lvl:1s,id:70s") || stack.getEnchantmentTagList().toString().contains("id:70s,lvl:1s");
     }
 
     private boolean shouldMend(ItemStack stack) {
-        return (stack != ItemStack.EMPTY && (100 * stack.getItemDamage() / stack.getMaxDamage()) >= threshold.getValue());
+        return ((stack != ItemStack.EMPTY) && ((100 * stack.getItemDamage()) / stack.getMaxDamage()) >= (100 - threshold.getValue()));
     }
 
     @Override
