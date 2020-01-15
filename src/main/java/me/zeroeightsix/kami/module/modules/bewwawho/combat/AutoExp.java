@@ -74,6 +74,10 @@ public class AutoExp extends Module {
         return ((stack != ItemStack.EMPTY) && ((100 * stack.getItemDamage()) / stack.getMaxDamage()) >= (100 - threshold.getValue()));
     }
 
+    private boolean slotNull(int i) {
+        return mc.player.inventory.armorInventory.get(i) != ItemStack.EMPTY;
+    }
+
     @Override
     public void onUpdate() {
         if (delay.getValue() != oldDelay) {
@@ -93,10 +97,10 @@ public class AutoExp extends Module {
             return;
         }
 
-        if (checkRepairable.getValue() && !((hasMending(mc.player.inventory.armorInventory.get(0)) && shouldMend(mc.player.inventory.armorInventory.get(0)))
-                || (hasMending(mc.player.inventory.armorInventory.get(1)) && shouldMend(mc.player.inventory.armorInventory.get(1)))
-                || (hasMending(mc.player.inventory.armorInventory.get(2)) && shouldMend(mc.player.inventory.armorInventory.get(2)))
-                || (hasMending(mc.player.inventory.armorInventory.get(3)) && shouldMend(mc.player.inventory.armorInventory.get(3)))
+        if (checkRepairable.getValue() && !((hasMending(mc.player.inventory.armorInventory.get(0)) && shouldMend(mc.player.inventory.armorInventory.get(0)) && slotNull(0))
+                || (hasMending(mc.player.inventory.armorInventory.get(1)) && shouldMend(mc.player.inventory.armorInventory.get(1)) && slotNull(1))
+                || (hasMending(mc.player.inventory.armorInventory.get(2)) && shouldMend(mc.player.inventory.armorInventory.get(2)) && slotNull(1))
+                || (hasMending(mc.player.inventory.armorInventory.get(3)) && shouldMend(mc.player.inventory.armorInventory.get(3)) && slotNull(1))
                 || (hasMending(mc.player.getHeldItemOffhand()) && shouldMend(mc.player.getHeldItemOffhand())))) {
             return;
         }
