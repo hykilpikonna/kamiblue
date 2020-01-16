@@ -65,17 +65,21 @@ public class AutoExp extends Module {
         }
 
     }
-
-    private boolean hasMending(ItemStack stack) {
-        return stack.getEnchantmentTagList().toString().contains("lvl:1s,id:70s") || stack.getEnchantmentTagList().toString().contains("id:70s,lvl:1s");
-    }
-
-    private boolean shouldMend(ItemStack stack) {
-        return ((stack != ItemStack.EMPTY) && ((100 * stack.getItemDamage()) / stack.getMaxDamage()) >= (100 - threshold.getValue()));
+    
+    private boolean canAndShouldMend(int i) {
+        return (mc.player.inventory.armorInventory.get(i).getEnchantmentTagList().toString().contains("lvl:1s,id:70s") || mc.player.inventory.armorInventory.get(i).getEnchantmentTagList().toString().contains("id:70s,lvl:1s") && ((mc.player.inventory.armorInventory.get(i) != ItemStack.EMPTY) && ((100 * (mc.player.inventory.armorInventory.get(i).getItemDamage()) / mc.player.inventory.armorInventory.get(i).getMaxDamage()) >= (100 - threshold.getValue())));
     }
 
     private boolean slotNull(int i) {
-        return mc.player.inventory.armorInventory.get(i) != ItemStack.EMPTY;
+        return mc.player.inventory.armorInventory.get(i) == ItemStack.EMPTY;
+    }
+
+    private boolean canAndShouldMendOffhand() {
+        return (mc.player.getHeldItemOffhand().getEnchantmentTagList().toString().contains("lvl:1s,id:70s") || mc.player.getHeldItemOffhand().getEnchantmentTagList().toString().contains("id:70s,lvl:1s") && ((mc.player.getHeldItemOffhand() != ItemStack.EMPTY) && ((100 * (mc.player.getHeldItemOffhand().getItemDamage()) / mc.player.getHeldItemOffhand().getMaxDamage()) >= (100 - threshold.getValue())));
+    }
+
+    private boolean slotNullOffhand() {
+        return mc.player.getHeldItemOffhand() == ItemStack.EMPTY;
     }
 
     @Override
@@ -97,11 +101,11 @@ public class AutoExp extends Module {
             return;
         }
 
-        if (checkRepairable.getValue() && !((hasMending(mc.player.inventory.armorInventory.get(0)) && shouldMend(mc.player.inventory.armorInventory.get(0)) && slotNull(0))
-                || (hasMending(mc.player.inventory.armorInventory.get(1)) && shouldMend(mc.player.inventory.armorInventory.get(1)) && slotNull(1))
-                || (hasMending(mc.player.inventory.armorInventory.get(2)) && shouldMend(mc.player.inventory.armorInventory.get(2)) && slotNull(2))
-                || (hasMending(mc.player.inventory.armorInventory.get(3)) && shouldMend(mc.player.inventory.armorInventory.get(3)) && slotNull(3))
-                || (hasMending(mc.player.getHeldItemOffhand()) && shouldMend(mc.player.getHeldItemOffhand())))) {
+        if (checkRepairable.getValue() && !((canAndShouldMend(0) || slotNull(0))
+                || (canAndShouldMend(1) || slotNull(1))
+                || (canAndShouldMend(2) || slotNull(2))
+                || (canAndShouldMend(3) || slotNull(3))
+                || (canAndShouldMendOffhand() || slotNullOffhand())) {
             return;
         }
 
