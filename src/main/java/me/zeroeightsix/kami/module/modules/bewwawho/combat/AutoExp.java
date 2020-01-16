@@ -65,17 +65,29 @@ public class AutoExp extends Module {
         }
 
     }
-    
-    private boolean canAndShouldMend(int i) {
-        return (mc.player.inventory.armorInventory.get(i).getEnchantmentTagList().toString().contains("lvl:1s,id:70s") || mc.player.inventory.armorInventory.get(i).getEnchantmentTagList().toString().contains("id:70s,lvl:1s") && ((mc.player.inventory.armorInventory.get(i) != ItemStack.EMPTY) && ((100 * (mc.player.inventory.armorInventory.get(i).getItemDamage()) / mc.player.inventory.armorInventory.get(i).getMaxDamage()) >= (100 - threshold.getValue())));
+
+    /* Should do mending and can mend */
+    private boolean canMend(int i) {
+        return ((mc.player.inventory.armorInventory.get(i).getEnchantmentTagList().toString().contains("lvl:1s,id:70s") || mc.player.inventory.armorInventory.get(i).getEnchantmentTagList().toString().contains("id:70s,lvl:1s")) && ((mc.player.inventory.armorInventory.get(i) != ItemStack.EMPTY)));
     }
 
+    private boolean shouldMend(int i) { // (100 * damage / max damage) >= (100 - 70)
+        return ((100 * (mc.player.inventory.armorInventory.get(i).getItemDamage()) / mc.player.inventory.armorInventory.get(i).getMaxDamage()) >= (100 - threshold.getValue()));
+    }
+
+    // not bothering with offhand right now as not even regular armour slots work
+//    private boolean canAndShouldMendOffhand() {
+//        return (containsMending() && ((mc.player.getHeldItemOffhand() != ItemStack.EMPTY) && ((100 * (mc.player.getHeldItemOffhand().getItemDamage()) / mc.player.getHeldItemOffhand().getMaxDamage()) >= (100 - threshold.getValue()))));
+//    }
+
+    /* Has mending enchantment */
+    private boolean containsMending() {
+        return mc.player.getHeldItemOffhand().getEnchantmentTagList().toString().contains("lvl:1s,id:70s") || mc.player.getHeldItemOffhand().getEnchantmentTagList().toString().contains("id:70s,lvl:1s");
+    }
+
+    /* Are any of the slots empty */
     private boolean slotNull(int i) {
         return mc.player.inventory.armorInventory.get(i) == ItemStack.EMPTY;
-    }
-
-    private boolean canAndShouldMendOffhand() {
-        return (mc.player.getHeldItemOffhand().getEnchantmentTagList().toString().contains("lvl:1s,id:70s") || mc.player.getHeldItemOffhand().getEnchantmentTagList().toString().contains("id:70s,lvl:1s") && ((mc.player.getHeldItemOffhand() != ItemStack.EMPTY) && ((100 * (mc.player.getHeldItemOffhand().getItemDamage()) / mc.player.getHeldItemOffhand().getMaxDamage()) >= (100 - threshold.getValue())));
     }
 
     private boolean slotNullOffhand() {
@@ -101,11 +113,13 @@ public class AutoExp extends Module {
             return;
         }
 
-        if (checkRepairable.getValue() && !((canAndShouldMend(0) || slotNull(0))
-                || (canAndShouldMend(1) || slotNull(1))
-                || (canAndShouldMend(2) || slotNull(2))
-                || (canAndShouldMend(3) || slotNull(3))
-                || (canAndShouldMendOffhand() || slotNullOffhand())) {
+        if (checkRepairable.getValue()
+                && !((canMend(0) && shouldMend(0) || slotNull(0))
+                || (canMend(1) && shouldMend(1) || slotNull(1))
+                || (canMend(2) && shouldMend(2)|| slotNull(2))
+                || (canMend(3) && shouldMend(3)|| slotNull(3)))) // comment )) once done offhand
+//                || (canAndShouldMendOffhand() || slotNullOffhand()))) {
+        { // comment this once offhand works
             return;
         }
 
