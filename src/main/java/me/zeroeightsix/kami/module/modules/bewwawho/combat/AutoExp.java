@@ -64,7 +64,7 @@ public class AutoExp extends Module {
     public void onUpdate() {
         if (mc.player == null) return;
 
-        if (slotNotEmpty(1)) Command.sendChatMessage("not empty");
+//        if (slotNotEmpty(1)) Command.sendChatMessage("not empty");
         if (delay.getValue() != oldDelay) usableDelay = delay.getValue();
 
         oldDelay = delay.getValue();
@@ -77,7 +77,7 @@ public class AutoExp extends Module {
         }
 
         if (checkRepairable.getValue()
-                && ((slotNotEmpty(0) && canMendArmour(0) && shouldMendArmour(0))
+                && !((slotNotEmpty(0) && canMendArmour(0) && shouldMendArmour(0))
                 || (slotNotEmpty(1) && canMendArmour(1) && shouldMendArmour(1))
                 || (slotNotEmpty(2) && canMendArmour(2) && shouldMendArmour(2))
                 || (slotNotEmpty(3) && canMendArmour(3) && shouldMendArmour(3))
