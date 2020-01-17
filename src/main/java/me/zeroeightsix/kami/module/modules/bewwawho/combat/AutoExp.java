@@ -23,6 +23,7 @@ public class AutoExp extends Module {
     private Setting<Boolean> autoSwitch = register(Settings.b("Auto Switch", true));
     private Setting<Boolean> autoDisable = register(Settings.booleanBuilder("Auto Disable").withValue(true).withVisibility(o -> autoSwitch.getValue()).build());
     private Setting<Boolean> checkRepairable = register(Settings.b("Check Repairable", true));
+    private Setting<Boolean> mendOffhand = register(Settings.b("Mend Offhand", false));
     private Setting<Integer> threshold = register(Settings.integerBuilder("Repair %").withMinimum(1).withMaximum(100).withValue(70));
     private Setting<Integer> delay = register(Settings.integerBuilder("Delay (Ticks)").withMinimum(1).withValue(1));
 
@@ -31,8 +32,7 @@ public class AutoExp extends Module {
     private int oldDelay = delay.getValue();
 
     @EventHandler
-    private Listener<PacketEvent.Receive> receiveListener = new Listener<>(event ->
-    {
+    private Listener<PacketEvent.Receive> receiveListener = new Listener<>(event -> {
         if (mc.player != null && (mc.player.getHeldItemMainhand().getItem() == Items.EXPERIENCE_BOTTLE)) {
             mc.rightClickDelayTimer = 0;
         }
@@ -40,10 +40,7 @@ public class AutoExp extends Module {
 
     @Override
     protected void onEnable() {
-
-        if (mc.player == null) {
-            return;
-        }
+        if (mc.player == null) return;
 
         if (autoSwitch.getValue()) {
             initHotbarSlot = mc.player.inventory.currentItem;
@@ -53,10 +50,7 @@ public class AutoExp extends Module {
 
     @Override
     protected void onDisable() {
-
-        if (mc.player == null) {
-            return;
-        }
+        if (mc.player == null) return;
 
         if (autoSwitch.getValue()) {
             if (initHotbarSlot != -1 && initHotbarSlot != mc.player.inventory.currentItem) {
@@ -66,36 +60,52 @@ public class AutoExp extends Module {
 
     }
 
+    // /give @p diamond_chestplate 1 527 {ench:[{lvl:1s,id:70s}]}
     /* Should do mending and can mend */
-    private boolean canMend(int i) {
-        return ((mc.player.inventory.armorInventory.get(i).getEnchantmentTagList().toString().contains("lvl:1s,id:70s") || mc.player.inventory.armorInventory.get(i).getEnchantmentTagList().toString().contains("id:70s,lvl:1s")) && ((mc.player.inventory.armorInventory.get(i) != ItemStack.EMPTY)));
+    private boolean shouldMendArmour(int i) { // (100 * damage / max damage) >= (100 - 70)
+        return (
+                (100 * mc.player.inventory.armorInventory.get(i).getItemDamage())
+                / mc.player.inventory.armorInventory.get(i).getMaxDamage())
+                < threshold.getValue();
     }
-
-    private boolean shouldMend(int i) { // (100 * damage / max damage) >= (100 - 70)
-        return ((100 * (mc.player.inventory.armorInventory.get(i).getItemDamage()) / mc.player.inventory.armorInventory.get(i).getMaxDamage()) >= (100 - threshold.getValue()));
+    private boolean shouldMendOffhand() {
+        return (mendOffhand.getValue() &&
+                ((100 * mc.player.getHeldItemOffhand().getItemDamage() / mc.player.getHeldItemOffhand().getMaxDamage())
+                < threshold.getValue()));
     }
-
-    // not bothering with offhand right now as not even regular armour slots work
-//    private boolean canAndShouldMendOffhand() {
-//        return (containsMending() && ((mc.player.getHeldItemOffhand() != ItemStack.EMPTY) && ((100 * (mc.player.getHeldItemOffhand().getItemDamage()) / mc.player.getHeldItemOffhand().getMaxDamage()) >= (100 - threshold.getValue()))));
-//    }
 
     /* Has mending enchantment */
-    private boolean containsMending() {
-        return mc.player.getHeldItemOffhand().getEnchantmentTagList().toString().contains("lvl:1s,id:70s") || mc.player.getHeldItemOffhand().getEnchantmentTagList().toString().contains("id:70s,lvl:1s");
+    private boolean canMendArmour(int i) {
+        return (mc.player.inventory.armorInventory.get(i).getEnchantmentTagList().toString().contains("lvl:1s,id:70s") || mc.player.inventory.armorInventory.get(i).getEnchantmentTagList().toString().contains("id:70s,lvl:1s"));
+    }
+    private boolean canMendOffhand() {
+        return mendOffhand.getValue() && (mc.player.getHeldItemOffhand().getEnchantmentTagList().toString().contains("lvl:1s,id:70s") || mc.player.getHeldItemOffhand().getEnchantmentTagList().toString().contains("id:70s,lvl:1s"));
     }
 
     /* Are any of the slots empty */
-    private boolean slotNull(int i) {
-        return mc.player.inventory.armorInventory.get(i) == ItemStack.EMPTY;
+    private boolean slotNotEmpty(int i) {
+        return mc.player.inventory.armorInventory.get(i) != ItemStack.EMPTY;
+    }
+    private boolean offhandNotEmpty() {
+        return mendOffhand.getValue() && mc.player.getHeldItemOffhand() != ItemStack.EMPTY;
     }
 
-    private boolean slotNullOffhand() {
-        return mc.player.getHeldItemOffhand() == ItemStack.EMPTY;
+    /* Does the player have experience bottles */
+    private int findXpPots() {
+        int slot = -1;
+        for (int i = 0; i < 9; i++) {
+            if (mc.player.inventory.getStackInSlot(i).getItem() == Items.EXPERIENCE_BOTTLE) {
+                slot = i;
+                break;
+            }
+        }
+        return slot;
     }
 
     @Override
     public void onUpdate() {
+        if (mc.player != null) return;
+        
         if (delay.getValue() != oldDelay) {
             usableDelay = delay.getValue();
         }
@@ -109,17 +119,12 @@ public class AutoExp extends Module {
             usableDelay = delay.getValue();
         }
 
-        if (mc.player == null) {
-            return;
-        }
-
         if (checkRepairable.getValue()
-                && !((canMend(0) && shouldMend(0) || slotNull(0))
-                || (canMend(1) && shouldMend(1) || slotNull(1))
-                || (canMend(2) && shouldMend(2)|| slotNull(2))
-                || (canMend(3) && shouldMend(3)|| slotNull(3)))) // comment )) once done offhand
-//                || (canAndShouldMendOffhand() || slotNullOffhand()))) {
-        { // comment this once offhand works
+                && !((slotNotEmpty(0) && canMendArmour(0) && shouldMendArmour(0))
+                || (slotNotEmpty(1) && canMendArmour(1) && shouldMendArmour(1))
+                || (slotNotEmpty(2) && canMendArmour(2) && shouldMendArmour(2))
+                || (slotNotEmpty(3) && canMendArmour(3) && shouldMendArmour(3))
+                || (offhandNotEmpty() && canMendOffhand() && shouldMendOffhand()))) {
             return;
         }
 
@@ -138,18 +143,5 @@ public class AutoExp extends Module {
         if (autoThrow.getValue() && mc.player.getHeldItemMainhand().getItem() == Items.EXPERIENCE_BOTTLE) {
             mc.rightClickMouse();
         }
-
     }
-
-    private int findXpPots() {
-        int slot = -1;
-        for (int i = 0; i < 9; i++) {
-            if (mc.player.inventory.getStackInSlot(i).getItem() == Items.EXPERIENCE_BOTTLE) {
-                slot = i;
-                break;
-            }
-        }
-        return slot;
-    }
-
 }
