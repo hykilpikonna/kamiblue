@@ -105,10 +105,8 @@ public class AutoExp extends Module {
     @Override
     public void onUpdate() {
         if (mc.player != null) return;
-        
-        if (delay.getValue() != oldDelay) {
-            usableDelay = delay.getValue();
-        }
+
+        if (delay.getValue() != oldDelay) usableDelay = delay.getValue();
 
         oldDelay = delay.getValue();
 
