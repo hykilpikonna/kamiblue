@@ -13,8 +13,8 @@ import net.minecraft.item.ItemStack;
 /**
  * Created 17 October 2019 by hub
  * Updated 21 November 2019 by hub
- * Updated 15 January 2020 by d1gress/Qther
  * Updated by S-B99 on 15/01/20
+ * Updated 18 January 2020 by d1gress/Qther
  */
 @Module.Info(name = "AutoExp", category = Module.Category.COMBAT, description = "Auto Switch to XP and throw fast")
 public class AutoExp extends Module {
@@ -77,11 +77,11 @@ public class AutoExp extends Module {
         }
 
         if (checkRepairable.getValue()
-                && !((slotNotEmpty(0) && canMendArmour(0) && shouldMendArmour(0))
-                || (slotNotEmpty(1) && canMendArmour(1) && shouldMendArmour(1))
-                || (slotNotEmpty(2) && canMendArmour(2) && shouldMendArmour(2))
-                || (slotNotEmpty(3) && canMendArmour(3) && shouldMendArmour(3))
-                || (offhandNotEmpty() && canMendOffhand() && shouldMendOffhand()))) {
+                && ((slotEmpty(0) || cannotMendArmour(0) || shouldNotMendArmour(0))
+                || (slotEmpty(1) || cannotMendArmour(1) || shouldNotMendArmour(1))
+                || (slotEmpty(2) || cannotMendArmour(2) || shouldNotMendArmour(2))
+                || (slotEmpty(3) || cannotMendArmour(3) || shouldNotMendArmour(3))
+                || (offhandEmpty() || cannotMendOffhand() || shouldNotMendOffhand()))) {
             return;
         }
 
@@ -106,33 +106,33 @@ public class AutoExp extends Module {
 /give @p diamond_chestplate 1 200 {ench:[{lvl:1s,id:70s}]}
     */
 
-    /* Should do mending and can mend */
-    private boolean shouldMendArmour(int i) { // (100 * damage / max damage) >= (100 - 70)
+    /* Should not do mending and can not mend */
+    private boolean shouldNotMendArmour(int i) { // (100 * damage / max damage) >= (100 - 70)
         return (
-                (100 * mc.player.inventory.armorInventory.get(i).getItemDamage())
-                / mc.player.inventory.armorInventory.get(i).getMaxDamage())
-                < threshold.getValue();
+                100 * mc.player.inventory.armorInventory.get(i).getItemDamage())
+                / mc.player.inventory.armorInventory.get(i).getMaxDamage()
+                > threshold.getValue();
     }
-    private boolean shouldMendOffhand() {
-        return (mendOffhand.getValue() &&
-                ((100 * mc.player.getHeldItemOffhand().getItemDamage() / mc.player.getHeldItemOffhand().getMaxDamage())
-                < threshold.getValue()));
+    private boolean shouldNotMendOffhand() {
+        return mendOffhand.getValue() &&
+                100 * mc.player.getHeldItemOffhand().getItemDamage() / mc.player.getHeldItemOffhand().getMaxDamage()
+                > threshold.getValue();
     }
 
-    /* Has mending enchantment */
-    private boolean canMendArmour(int i) {
-        return (mc.player.inventory.armorInventory.get(i).getEnchantmentTagList().toString().contains("lvl:1s,id:70s") || mc.player.inventory.armorInventory.get(i).getEnchantmentTagList().toString().contains("id:70s,lvl:1s"));
+    /* Has no mending enchantment */
+    private boolean cannotMendArmour(int i) {
+        return !(mc.player.inventory.armorInventory.get(i).getEnchantmentTagList().toString().contains("lvl:1s,id:70s") || mc.player.inventory.armorInventory.get(i).getEnchantmentTagList().toString().contains("id:70s,lvl:1s"));
     }
-    private boolean canMendOffhand() {
-        return mendOffhand.getValue() && (mc.player.getHeldItemOffhand().getEnchantmentTagList().toString().contains("lvl:1s,id:70s") || mc.player.getHeldItemOffhand().getEnchantmentTagList().toString().contains("id:70s,lvl:1s"));
+    private boolean cannotMendOffhand() {
+        return !(mendOffhand.getValue() && (mc.player.getHeldItemOffhand().getEnchantmentTagList().toString().contains("lvl:1s,id:70s") || mc.player.getHeldItemOffhand().getEnchantmentTagList().toString().contains("id:70s,lvl:1s")));
     }
 
     /* Are any of the slots empty */
-    private boolean slotNotEmpty(int i) {
-        return mc.player.inventory.armorInventory.get(i) != ItemStack.EMPTY;
+    private boolean slotEmpty(int i) {
+        return mc.player.inventory.armorInventory.get(i) == ItemStack.EMPTY;
     }
-    private boolean offhandNotEmpty() {
-        return mendOffhand.getValue() && mc.player.getHeldItemOffhand() != ItemStack.EMPTY;
+    private boolean offhandEmpty() {
+        return mendOffhand.getValue() && mc.player.getHeldItemOffhand() == ItemStack.EMPTY;
     }
 
     /* Does the player have experience bottles */
