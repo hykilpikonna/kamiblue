@@ -1,15 +1,7 @@
 [
   {
     "uuid": "47f78584-c76c-4191-92fd-8c943af13054",
-    "type": "1"
-  },
-  {
-    "uuid": "8eea2cfc-9ebb-41dd-a77f-007404d98d4b",
-    "type": "-1"
-  },
-  {
-    "uuid": "071c6502-2cac-49a7-b316-b57866c69f83",
-    "type": "-1"
+    "type": "5"
   },
   {
     "uuid": "f6d096cb-b784-4c05-9f4f-a0af9e397d98",
@@ -17,7 +9,7 @@
   },
   {
     "uuid": "c1ca957e-fb26-4ea0-b339-20802fcf2d33",
-    "type": "-1"
+    "type": "5"
   },
   {
     "uuid": "6ebdb21b-cf9c-40be-8357-18f872af4010",
